@@ -282,14 +282,17 @@ Update settings in the database (`settings` table) or create an admin settings p
 
 ## License
 
-This project was developed by Eugene Simpson a final year IT student of the University of Energy and Natural Resources. This is for demonstration and educational purposes but can be used at production level. Call or Whatsapp +233 599 04 8888 if interested
+This project was developed by Eugene Simpson a final year IT student of the University of Energy and Natural Resources. This is for demonstration and educational purposes but can be used at production level.
+Contact: Call or Whatsapp +233 599 04 8888 if interested
+Email: eskdev34@gmail.com
+Social Media(X and Linkedin): eskdev34
 
 ## Credit
 - Font Awesome for icons
 - Google Fonts for typography
 - Unsplash for placeholder images
 - Xampp for testing locally
-- 
+- All php developers in the world
 
 ---
 
