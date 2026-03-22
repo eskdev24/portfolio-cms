@@ -85,7 +85,7 @@ A complete, production-ready Portfolio Content Management System built with Core
 
 **Option A: Using phpMyAdmin**
 1. Click "Import" tab
-2. Choose the `database.sql` file from this project
+2. Choose the `database.sql` or `portfolio_cms.sql`  file from this project
 3. Click "Go" to import
 
 **Option B: Using MySQL Command Line**
@@ -93,7 +93,7 @@ A complete, production-ready Portfolio Content Management System built with Core
 mysql -u root -p
 CREATE DATABASE portfolio_cms;
 USE portfolio_cms;
-SOURCE path/to/database.sql;
+SOURCE path/to/database.sql or portfolio_cms.sql;
 ```
 
 ### Step 2: Configure Database Connection
@@ -136,9 +136,9 @@ chmod 755 uploads/blog/
 
 ### Step 5: Access the Website
 
-- **Website**: http://localhost:8080/portfolio-cms/
-- **Admin Dashboard**: http://localhost:8080/portfolio-cms/admin/
-- **Admin Login**: http://localhost:8080/portfolio-cms/admin/login.php
+- **Website**: http://localhost/portfolio-cms/
+- **Admin Dashboard**: http://localhost/portfolio-cms/admin/
+- **Admin Login**: http://localhost/portfolio-cms/admin/login.php
 
 ## Default Admin Credentials
 
@@ -291,4 +291,4 @@ This project is for demonstration purposes.
 
 ---
 
-Built with care for professional portfolios.
+Built with care for personal professional portfolio management.
