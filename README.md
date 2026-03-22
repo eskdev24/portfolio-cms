@@ -1,4 +1,4 @@
-# Portfolio CMS - Eugene Simpson
+# Portfolio CMS
 
 A complete, production-ready Portfolio Content Management System built with Core PHP and MySQL.
 
