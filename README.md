@@ -37,6 +37,8 @@ A complete, production-ready Portfolio Content Management System built with Core
 │   ├── manage_blog.php
 │   ├── manage_skills.php
 │   ├── manage_messages.php
+|   ├── manage_testimonials.php
+|   ├── settings.php
 │   ├── add_project.php
 │   ├── edit_project.php
 │   ├── add_post.php
@@ -65,7 +67,7 @@ A complete, production-ready Portfolio Content Management System built with Core
 ├── blog.php
 ├── contact.php
 ├── database.sql
-├── .htaccess
+├── portfolio_cms.sql
 └── README.md
 ```
 
