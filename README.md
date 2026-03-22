@@ -154,9 +154,9 @@ chmod 755 uploads/blog/
 Edit `includes/config.php`:
 
 ```php
-define('SITE_NAME', 'Eugene Simpson');
-define('SITE_TAGLINE', 'Web Developer & Designer');
-define('SITE_URL', 'http://localhost:8080/portfolio-cms');
+define('SITE_NAME', 'Your Name');
+define('SITE_TAGLINE', 'Your Profession');
+define('SITE_URL', 'http://localhost/portfolio-cms');
 
 // Pagination
 define('ITEMS_PER_PAGE', 6);
@@ -275,20 +275,20 @@ Update settings in the database (`settings` table) or create an admin settings p
 - Check error logs
 
 ### CSS/JS Not Loading
-- Verify .htaccess is working
 - Check file paths in header.php
 - Clear browser cache
 
 ## License
 
-This project is for demonstration purposes.
+This project was developed by Eugene Simpson a final year IT student of the University of Energy and Natural Resources. This is for demonstration and educational purposes but can be used at production level. Call or Whatsapp +233 599 04 8888 if interested
 
-## Credits
-
+## Credit
 - Font Awesome for icons
 - Google Fonts for typography
-- Unsplash for placeholder images (if used)
+- Unsplash for placeholder images
+- Xampp for testing locally
+- 
 
 ---
 
-Built with care for personal professional portfolio management.
+Built with love for personal professional portfolio management.
