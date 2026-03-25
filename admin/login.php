@@ -1,22 +1,26 @@
 <?php
 require_once '../includes/config.php';
 require_once '../includes/db.php';
+require_once '../includes/helpers.php';
 require_once '../includes/auth.php';
 
 if (isLoggedIn()) {
     redirect(ADMIN_URL . '/dashboard.php');
 }
 
+$siteName = getSetting('site_name', 'esk.dev');
+
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = sanitize($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
+    $remember = isset($_POST['remember']);
     
     if (empty($username) || empty($password)) {
         $error = 'Please enter both username and password.';
     } else {
-        if (login($username, $password)) {
+        if (login($username, $password, $remember)) {
             redirect(ADMIN_URL . '/dashboard.php');
         } else {
             $error = 'Invalid username or password.';
@@ -30,6 +34,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login | <?php echo escape(SITE_NAME); ?></title>
+    
+    <?php $favicon = getSetting('favicon'); ?>
+    <?php if (!empty($favicon) && file_exists(ROOT_PATH . 'uploads/' . $favicon)): ?>
+        <link rel="icon" type="image/x-icon" href="<?php echo SITE_URL; ?>/uploads/<?php echo escape($favicon); ?>">
+    <?php else: ?>
+        <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAZ5JREFUWIXtl7FuwzAMRB+NsGnXDs0SnKKdOi6gS5cuobN0SJcuXbp0yk2n0+nSIZ2gBEJYv4S/EsX2e2P/YEcA/H8iwOVy+R6Px/fL5fJ9uVy+z+fz93Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/l1+f4HAJfV3hQ4b0OQAAAAASUVORK5CYII=">
+    <?php endif; ?>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -63,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="login-card">
             <div class="login-header">
                 <div class="login-logo">
-                    Eugene<span>.</span>Simpson
+                    <?php echo formatLogo($siteName); ?>
                 </div>
                 <p class="login-subtitle">Sign in to your admin account</p>
             </div>

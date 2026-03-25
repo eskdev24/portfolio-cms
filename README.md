@@ -1,22 +1,37 @@
-# Portfolio CMS
+# Portfolio CMS - esk.dev
 
-A complete, production-ready Portfolio Content Management System built with Core PHP and MySQL.
+A complete, production-ready Portfolio Content Management System built with Core PHP and MySQL for Eugene Simpson (Web Developer & Graphic Designer).
 
 ## Features
 
-- **Public Portfolio Website**
-  - Responsive design with dark/light mode
-  - Smooth animations and transitions
-  - Blog system with search and pagination
-  - Contact form with validation
-  - Project filtering by category
+### Public Website
+- **Home Page**: Hero section, skills (circular animated progress), featured projects, testimonials slider, blog preview, CTA
+- **About Page**: About section, skills by category (development/design), experience & education, statistics
+- **Portfolio**: Project filtering by category, responsive grid layout
+- **Blog**: Search functionality, pagination, comments system, author support
+- **Contact**: Contact form with validation, WhatsApp integration, Formspree notifications
 
-- **Admin Dashboard**
-  - Secure authentication with password hashing
-  - Dashboard with statistics
-  - CRUD operations for all content types
-  - Image upload functionality
-  - Message management
+### Admin Dashboard
+- Secure authentication with password hashing + remember me
+- Dashboard with statistics
+- **Project Management**: Add/edit/delete with image upload
+- **Blog Management**: Add/edit/delete with Quill rich text editor, custom author names
+- **Skills Management**: Circular progress display
+- **Testimonials Management**: With profile images
+- **Experience & Education**: Dynamic management
+- **Messages Management**: Contact form submissions
+- **Comments Management**: Blog post comments
+- **Settings**: Site name, favicon, hero/about images, CV, social links, Formspree, WhatsApp
+
+### UI/UX Features
+- Dark/light mode toggle
+- Responsive design (mobile-first)
+- Animated statistics counters
+- Testimonials slider (20s auto-advance)
+- Circular skill progress with animations
+- Toast notifications for forms
+- Custom logo design (esk.dev)
+- Favicon support
 
 ## Tech Stack
 
@@ -29,16 +44,18 @@ A complete, production-ready Portfolio Content Management System built with Core
 
 ```
 /portfolio-cms
-├── /admin                 # Admin dashboard
+├── /admin                     # Admin dashboard
 │   ├── dashboard.php
 │   ├── login.php
 │   ├── logout.php
+│   ├── settings.php
 │   ├── manage_projects.php
 │   ├── manage_blog.php
 │   ├── manage_skills.php
+│   ├── manage_testimonials.php
+│   ├── manage_experience.php
 │   ├── manage_messages.php
-|   ├── manage_testimonials.php
-|   ├── settings.php
+│   ├── manage_comments.php
 │   ├── add_project.php
 │   ├── edit_project.php
 │   ├── add_post.php
@@ -48,251 +65,204 @@ A complete, production-ready Portfolio Content Management System built with Core
 │   │   ├── main.css
 │   │   ├── admin.css
 │   │   └── animations.css
-│   ├── /js
-│   │   └── main.js
-│   └── /images
+│   └── /js
+│       └── main.js
+├── /db
+|   └── database.sql
 ├── /includes
 │   ├── config.php
 │   ├── db.php
 │   ├── helpers.php
 │   ├── auth.php
 │   ├── header.php
-│   └── footer.php
+│   ├── footer.php
+│   ├── process_contact.php
+│   └── process_comment.php
 ├── /uploads
 │   ├── /projects
-│   └── /blog
+│   ├── /blog
+│   ├── /testimonials
+│   └── favicon.ico
 ├── index.php
 ├── about.php
 ├── portfolio.php
 ├── blog.php
 ├── contact.php
-├── database.sql
-├── portfolio_cms.sql
 └── README.md
 ```
 
-## Installation Instructions
+## Installation
 
 ### Prerequisites
-
-- XAMPP (or similar PHP + MySQL stack)
+- XAMPP (PHP 8.0+ + MySQL)
 - Web browser
 - Code editor
 
 ### Step 1: Setup Database
+1. Start Apache and MySQL in XAMPP
+2. Open phpMyAdmin (http://localhost/phpmyadmin)
+3. Create database `portfolio_cms`
+4. Import `database.sql`
 
-1. Open XAMPP Control Panel
-2. Start Apache and MySQL services
-3. Click "Admin" next to MySQL to open phpMyAdmin
+### Step 2: Run Additional SQL
+Execute these in phpMyAdmin for new features:
 
-**Option A: Using phpMyAdmin**
-1. Click "Import" tab
-2. Choose the `database.sql` or `portfolio_cms.sql`  file from this project
-3. Click "Go" to import
+```sql
+-- Blog author name
+ALTER TABLE blog_posts ADD COLUMN author_name VARCHAR(100) DEFAULT NULL AFTER author_id;
 
-**Option B: Using MySQL Command Line**
-```bash
-mysql -u root -p
-CREATE DATABASE portfolio_cms;
-USE portfolio_cms;
-SOURCE path/to/database.sql or portfolio_cms.sql;
+-- Remember me token
+ALTER TABLE users ADD COLUMN remember_token VARCHAR(255) DEFAULT NULL;
+ALTER TABLE users ADD COLUMN remember_token_expires DATETIME DEFAULT NULL;
+
+-- Testimonial images
+ALTER TABLE testimonials ADD COLUMN image VARCHAR(255) DEFAULT NULL;
+
+-- Experience & Education tables
+CREATE TABLE IF NOT EXISTS experience (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    year VARCHAR(50) NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    company VARCHAR(150) NOT NULL,
+    description TEXT,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    sort_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS education (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    year VARCHAR(50) NOT NULL,
+    degree VARCHAR(150) NOT NULL,
+    school VARCHAR(150) NOT NULL,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    sort_order INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS activity_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT DEFAULT NULL,
+    action VARCHAR(100) NOT NULL,
+    description TEXT,
+    ip_address VARCHAR(45) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 ```
 
-### Step 2: Configure Database Connection
+### Step 3: Access
+- **Website**: http://localhost/apps/portfolio-cms/
+- **Admin**: http://localhost/apps/portfolio-cms/admin/
+- **Login**: http://localhost/apps/portfolio-cms/admin/login.php
 
-Edit `includes/config.php` if needed:
+### Default Credentials
+| Username | Password |
+|----------|----------|
+| admin | admin123 |
 
+## Configuration
+
+### Site Settings (Admin Panel)
+Go to **Settings** in admin dashboard to configure:
+- Your Name (Eugene Simpson)
+- Site Name (esk.dev)
+- Site Tagline
+- Favicon
+- Hero/About images
+- CV download
+- Social media links
+- WhatsApp number
+- Formspree endpoint
+
+### Config File (includes/config.php)
 ```php
+define('NAME', 'Eugene Simpson');
+define('SITE_NAME', 'esk.dev');
+define('SITE_URL', 'http://localhost/apps/portfolio-cms');
+define('ADMIN_URL', SITE_URL . '/admin');
+
+// Database
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'portfolio_cms');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 ```
 
-### Step 3: Update Admin Password
-
-The default admin password is `admin123`. You should change this:
-
-1. Go to phpMyAdmin
-2. Navigate to `portfolio_cms` > `users` table
-3. Edit the admin user and replace the password with a bcrypt hash
-
-Or update via SQL:
-```sql
-UPDATE users SET password = '$2y$10$YourNewHashedPasswordHere' WHERE username = 'admin';
-```
-
-Generate a new password hash using PHP:
-```php
-echo password_hash('your_new_password', PASSWORD_BCRYPT);
-```
-
-### Step 4: Set Folder Permissions
-
-Ensure the uploads folder is writable:
-```bash
-chmod 755 uploads/
-chmod 755 uploads/projects/
-chmod 755 uploads/blog/
-```
-
-### Step 5: Access the Website
-
-- **Website**: http://localhost/portfolio-cms/
-- **Admin Dashboard**: http://localhost/portfolio-cms/admin/
-- **Admin Login**: http://localhost/portfolio-cms/admin/login.php
-
-## Default Admin Credentials
-
-| Field | Value |
-|-------|-------|
-| Username | admin |
-| Password | admin123 |
-
-## Configuration
-
-### Site Settings
-
-Edit `includes/config.php`:
-
-```php
-define('SITE_NAME', 'Your Name');
-define('SITE_TAGLINE', 'Your Profession');
-define('SITE_URL', 'http://localhost/portfolio-cms');
-
-// Pagination
-define('ITEMS_PER_PAGE', 6);
-define('BLOG_PER_PAGE', 6);
-
-// Upload settings
-define('MAX_FILE_SIZE', 5242880); // 5MB
-```
-
-### Database Settings
-
-| Setting | Default | Description |
-|---------|---------|-------------|
-| DB_HOST | localhost | MySQL server host |
-| DB_NAME | portfolio_cms | Database name |
-| DB_USER | root | MySQL username |
-| DB_PASS | (empty) | MySQL password |
-
 ## Usage Guide
 
-### Adding Projects
+### Managing Experience & Education
+1. Go to Admin → Experience & Education
+2. Add work experience with year, title, company, description
+3. Add education with year, degree, school
+4. Set sort order to control display order
+5. Toggle active/inactive status
 
-1. Log in to admin dashboard
-2. Go to "Projects" > "Add Project"
-3. Fill in the details:
-   - Title (required)
-   - Short Description (required)
-   - Content (full details)
-   - Client name
-   - Project URL
-   - GitHub URL
-   - Technologies (comma-separated)
-   - Upload image
-   - Set status (Draft/Published)
-   - Mark as Featured if needed
-4. Click "Save Project"
+### Blog Posts with Custom Authors
+1. Go to Blog Posts → Add Post
+2. Fill in title, excerpt, content (use Quill editor)
+3. Optionally enter Author Name for guest posts
+4. Upload featured image
+5. Set status and publish date
 
-### Creating Blog Posts
+### Testimonials with Images
+1. Go to Testimonials
+2. Add testimonial with profile image
+3. Enter name, position, company, rating, content
 
-1. Go to "Blog Posts" > "Add Post"
-2. Fill in:
-   - Title (required)
-   - Excerpt (required)
-   - Full Content (HTML allowed)
-   - Category
-   - Tags
-   - Featured Image
-   - Status and Publish Date
-3. Save the post
+### Skills (Circular Progress)
+1. Go to Skills
+2. Add skills with category (development/design)
+3. Set proficiency percentage
+4. Add FontAwesome icon class
 
-### Managing Skills
+## Integrations
 
-1. Go to "Skills"
-2. Add new skills with:
-   - Name
-   - Category (Development/Design/Other)
-   - Proficiency percentage
-   - FontAwesome icon class
+### WhatsApp
+1. Add WhatsApp number in Settings (with country code, no +)
+2. Contact page shows "WhatsApp Me" button
 
-### Viewing Messages
+### Formspree (Email Notifications)
+1. Create account at formspree.io
+2. Create new form
+3. Copy endpoint URL
+4. Paste in Settings → Formspree Endpoint
 
-1. Go to "Messages" in the admin dashboard
-2. Click on a message to view details
-3. Mark as replied or delete
-
-## Security Features
+## Security
 
 - Password hashing with bcrypt
-- Prepared statements (PDO) for all queries
-- Input sanitization and validation
+- Prepared statements (PDO)
+- Input sanitization & validation
 - SQL injection prevention
-- XSS protection via output escaping
-- Protected admin routes
-- Session management
+- XSS protection
+- Remember me with secure tokens
+- Activity logging
 
 ## Customization
 
-### Changing Colors
-
-Edit `assets/css/main.css` - :root variables:
-
+### Colors (assets/css/main.css)
 ```css
 :root {
     --primary: #38bdf8;
-    --bg-primary: #0f172a;
-    /* ... other variables */
+    --secondary: #818cf8;
+    /* ... */
 }
 ```
 
-### Changing Fonts
-
-Update Google Fonts import and font-family in CSS.
-
-### Adding Social Links
-
-Update settings in the database (`settings` table) or create an admin settings page.
-
 ## Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
+- Chrome, Firefox, Safari, Edge (latest)
 - Mobile browsers
 
-## Troubleshooting
-
-### Database Connection Error
-- Verify MySQL is running
-- Check database credentials in config.php
-- Ensure database exists
-
-### Images Not Uploading
-- Check folder permissions (uploads/ should be 755)
-- Verify PHP upload settings in php.ini
-- Check error logs
-
-### CSS/JS Not Loading
-- Check file paths in header.php
-- Clear browser cache
-
 ## License
-
 This project was developed by Eugene Simpson a final year IT student of the University of Energy and Natural Resources. This is for demonstration and educational purposes but can be used at production level.
-Contact: Call or Whatsapp +233 599 04 8888 if interested.
-Email: eskdev34@gmail.com
+Contact me on +233 599 04 8888 or Email: eskdev34@gmail.com if interested in projects like these.
 
-## Credit
-- Font Awesome for icons
-- Google Fonts for typography
+## Credits
+- Font Awesome 6.4 for icons
+- Google Fonts (Poppins, Inter) for typography
+- Quill.js (Rich Text Editor) for blog editing
 - Unsplash for placeholder images
 - Xampp for testing locally
 - All php developers in the world
 
 ---
-
 Built with love for personal professional portfolio management.

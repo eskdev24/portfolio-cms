@@ -12,12 +12,15 @@ $success = false;
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $settings = [
+        $settings = [
+        'name' => sanitize($_POST['name'] ?? ''),
         'site_name' => sanitize($_POST['site_name'] ?? ''),
         'site_tagline' => sanitize($_POST['site_tagline'] ?? ''),
         'site_description' => sanitize($_POST['site_description'] ?? ''),
         'email' => sanitize($_POST['email'] ?? ''),
         'phone' => sanitize($_POST['phone'] ?? ''),
+        'whatsapp_number' => sanitize($_POST['whatsapp_number'] ?? ''),
+        'formspree_endpoint' => sanitize($_POST['formspree_endpoint'] ?? ''),
         'address' => sanitize($_POST['address'] ?? ''),
         'facebook_url' => sanitize($_POST['facebook_url'] ?? ''),
         'twitter_url' => sanitize($_POST['twitter_url'] ?? ''),
@@ -52,6 +55,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 "UPDATE users SET avatar = ? WHERE id = ?",
                 [$upload['filename'], $_SESSION['user_id']]
             );
+        }
+    }
+    
+    if (isset($_FILES['favicon']) && $_FILES['favicon']['error'] === UPLOAD_ERR_OK) {
+        $faviconFile = $_FILES['favicon'];
+        $allowedTypes = ['image/x-icon', 'image/png', 'image/jpeg', 'image/gif'];
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($faviconFile['tmp_name']);
+        
+        if (in_array($mimeType, $allowedTypes) || in_array($faviconFile['type'], ['image/x-icon', 'image/png', 'image/jpeg', 'image/gif'])) {
+            $extension = $mimeType === 'image/x-icon' ? 'ico' : 'png';
+            $filename = 'favicon.' . $extension;
+            $uploadPath = ROOT_PATH . 'uploads/' . $filename;
+            
+            if (move_uploaded_file($faviconFile['tmp_name'], $uploadPath)) {
+                db()->query(
+                    "INSERT INTO settings (setting_key, setting_value) VALUES ('favicon', ?) 
+                     ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)",
+                    [$filename]
+                );
+            }
         }
     }
     
@@ -145,6 +169,22 @@ $user = getCurrentUser();
     <div class="card-body">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
             <div>
+                <h4 style="margin-bottom: 1rem;">Favicon</h4>
+                <div style="border: 2px dashed var(--border-color); border-radius: var(--radius-lg); padding: 1rem; text-align: center; margin-bottom: 1rem; background: var(--bg-secondary);">
+                    <?php if (!empty($settings['favicon'])): ?>
+                        <img src="<?php echo SITE_URL; ?>/uploads/<?php echo escape($settings['favicon']); ?>" alt="Favicon" style="max-width: 32px; max-height: 32px;">
+                    <?php else: ?>
+                        <i class="fas fa-image" style="font-size: 1.5rem; color: var(--text-muted);"></i>
+                    <?php endif; ?>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Upload Favicon</label>
+                    <input type="file" name="favicon" class="form-control" accept=".ico,.png,.jpg,.gif">
+                    <div class="form-hint">ICO, PNG, JPG, GIF (32x32 recommended)</div>
+                </div>
+            </div>
+            
+            <div>
                 <h4 style="margin-bottom: 1rem;">Hero Section Image</h4>
                 <div style="border: 2px dashed var(--border-color); border-radius: var(--radius-lg); padding: 1rem; text-align: center; margin-bottom: 1rem; background: var(--bg-secondary);">
                     <?php if (!empty($settings['hero_image'])): ?>
@@ -218,15 +258,23 @@ $user = getCurrentUser();
     <div class="card-body">
             <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label">Site Name</label>
-                    <input type="text" name="site_name" class="form-control" 
-                           value="<?php echo escape($settings['site_name'] ?? 'Eugene Simpson'); ?>">
+                    <label class="form-label">Your Name</label>
+                    <input type="text" name="name" class="form-control" 
+                           value="<?php echo escape($settings['name'] ?? 'Eugene Simpson'); ?>">
+                    <div class="form-hint">Your full name (e.g., Eugene Simpson)</div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Site Tagline</label>
-                    <input type="text" name="site_tagline" class="form-control" 
-                           value="<?php echo escape($settings['site_tagline'] ?? 'Web Developer & Designer'); ?>">
+                    <label class="form-label">Site Name</label>
+                    <input type="text" name="site_name" class="form-control" 
+                           value="<?php echo escape($settings['site_name'] ?? 'esk.dev'); ?>">
+                    <div class="form-hint">Website name (e.g., esk.dev)</div>
                 </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Site Tagline</label>
+                <input type="text" name="site_tagline" class="form-control" 
+                       value="<?php echo escape($settings['site_tagline'] ?? 'Web Developer & Designer'); ?>">
             </div>
             
             <div class="form-group">
@@ -275,6 +323,18 @@ $user = getCurrentUser();
                     <label class="form-label">Phone</label>
                     <input type="tel" name="phone" class="form-control" 
                            value="<?php echo escape($settings['phone'] ?? ''); ?>">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">WhatsApp Number</label>
+                    <input type="tel" name="whatsapp_number" class="form-control" 
+                           value="<?php echo escape($settings['whatsapp_number'] ?? ''); ?>" placeholder="e.g., +1234567890">
+                    <div class="form-hint">Include country code, no + symbol</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Formspree Endpoint</label>
+                    <input type="url" name="formspree_endpoint" class="form-control" 
+                           value="<?php echo escape($settings['formspree_endpoint'] ?? ''); ?>" placeholder="https://formspree.io/f/xxxxxxxxx">
+                    <div class="form-hint">Formspree endpoint for email notifications (optional)</div>
                 </div>
             </div>
             

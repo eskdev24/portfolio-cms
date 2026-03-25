@@ -141,9 +141,16 @@ $pageTitle = 'Contact';
                 I'm currently available for freelance projects and collaborations.
                 Feel free to reach out if you'd like to work together!
             </p>
-            <a href="<?php echo SITE_URL; ?>/contact.php" class="btn btn-primary">
-                <i class="fas fa-calendar"></i> Schedule a Call
-            </a>
+            <?php $whatsapp = getSetting('whatsapp_number'); ?>
+            <?php if ($whatsapp): ?>
+                <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $whatsapp); ?>" target="_blank" class="btn btn-primary">
+                    <i class="fab fa-whatsapp"></i> WhatsApp Me
+                </a>
+            <?php else: ?>
+                <a href="<?php echo SITE_URL; ?>/contact.php" class="btn btn-primary">
+                    <i class="fas fa-calendar"></i> Schedule a Call
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 </section>

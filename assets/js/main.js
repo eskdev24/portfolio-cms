@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initContactForm();
     initProjectFilters();
     initTypingEffect();
+    initCountAnimation();
+    initTestimonialSlider();
+    initSkillCircles();
 });
 
 function initThemeToggle() {
@@ -257,6 +260,146 @@ function initTypingEffect() {
     }
     
     type();
+}
+
+function initCountAnimation() {
+    const statNumbers = document.querySelectorAll('.stat-number[data-target]');
+    if (statNumbers.length === 0) return;
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateNumber(entry.target);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.5
+    });
+    
+    statNumbers.forEach(el => observer.observe(el));
+}
+
+function animateNumber(element) {
+    const target = parseInt(element.dataset.target);
+    const duration = 2000;
+    const start = 0;
+    const startTime = performance.now();
+    
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(start + (target - start) * easeOut);
+        
+        element.textContent = current + '+';
+        
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
+    }
+    
+    requestAnimationFrame(update);
+}
+
+function initSkillCircles() {
+    const skillCircles = document.querySelectorAll('.skill-circle-progress');
+    if (skillCircles.length === 0) return;
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCircle(entry.target);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.5
+    });
+    
+    skillCircles.forEach(circle => observer.observe(circle));
+}
+
+function animateCircle(element) {
+    const progress = parseInt(element.dataset.progress);
+    const radius = 45;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (progress / 100) * circumference;
+    
+    element.style.strokeDashoffset = offset;
+}
+
+function initTestimonialSlider() {
+    const slider = document.querySelector('.testimonials-slider');
+    if (!slider) return;
+    
+    const slides = slider.querySelectorAll('.testimonial-slide');
+    if (slides.length === 0) return;
+    
+    const dots = document.querySelectorAll('.testimonial-dot');
+    const prevBtn = document.querySelector('.testimonial-prev');
+    const nextBtn = document.querySelector('.testimonial-next');
+    
+    let currentSlide = 0;
+    let slideInterval;
+    const intervalTime = 20000;
+    
+    function showSlide(index) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+        
+        slides[index].classList.add('active');
+        dots[index].classList.add('active');
+    }
+    
+    function nextSlide() {
+        currentSlide = (currentSlide + 1) % slides.length;
+        showSlide(currentSlide);
+    }
+    
+    function prevSlide() {
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        showSlide(currentSlide);
+    }
+    
+    function startInterval() {
+        stopInterval();
+        slideInterval = setInterval(nextSlide, intervalTime);
+    }
+    
+    function stopInterval() {
+        if (slideInterval) {
+            clearInterval(slideInterval);
+        }
+    }
+    
+    if (dots.length > 0) {
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                currentSlide = index;
+                showSlide(currentSlide);
+                startInterval();
+            });
+        });
+    }
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            prevSlide();
+            startInterval();
+        });
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            nextSlide();
+            startInterval();
+        });
+    }
+    
+    showSlide(0);
+    startInterval();
 }
 
 function validateForm(form) {

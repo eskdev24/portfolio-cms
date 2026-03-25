@@ -1,8 +1,12 @@
 <?php
+require_once '../includes/helpers.php';
+
 $currentPage = basename($_SERVER['PHP_SELF'], '.php');
 $unreadMessages = db()->count('messages', "status = 'unread'");
 $pendingComments = db()->count('blog_comments', "status = 'pending'");
 $user = getCurrentUser();
+$displayName = getSetting('name', $user['full_name'] ?? 'Admin');
+$siteName = getSetting('site_name', 'esk.dev');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,6 +14,14 @@ $user = getCurrentUser();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($pageTitle) ? escape($pageTitle) . ' | ' : ''; ?>Admin Dashboard</title>
+    
+    <?php $favicon = getSetting('favicon'); ?>
+    <?php if (!empty($favicon) && file_exists(ROOT_PATH . 'uploads/' . $favicon)): ?>
+        <link rel="icon" type="image/x-icon" href="<?php echo SITE_URL; ?>/uploads/<?php echo escape($favicon); ?>">
+    <?php else: ?>
+        <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAZ5JREFUWIXtl7FuwzAMRB+NsGnXDs0SnKKdOi6gS5cuobN0SJcuXbp0yk2n0+nSIZ2gBEJYv4S/EsX2e2P/YEcA/H8iwOVy+R6Px/fL5fJ9uVy+z+fz93Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/l1+f4HAJfV3hQ4b0OQAAAAASUVORK5CYII=">
+    <?php endif; ?>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -21,7 +33,7 @@ $user = getCurrentUser();
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a href="<?php echo ADMIN_URL; ?>/dashboard.php" class="sidebar-logo">
-                    Eugene<span>.</span>Simpson
+                    <?php echo formatLogo($siteName); ?>
                 </a>
             </div>
             
@@ -63,6 +75,12 @@ $user = getCurrentUser();
                             <a href="<?php echo ADMIN_URL; ?>/manage_testimonials.php" class="nav-link <?php echo $currentPage === 'manage_testimonials' ? 'active' : ''; ?>">
                                 <i class="fas fa-quote-left"></i>
                                 <span>Testimonials</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="<?php echo ADMIN_URL; ?>/manage_experience.php" class="nav-link <?php echo $currentPage === 'manage_experience' ? 'active' : ''; ?>">
+                                <i class="fas fa-briefcase"></i>
+                                <span>Experience & Education</span>
                             </a>
                         </li>
                     </ul>
@@ -136,10 +154,10 @@ $user = getCurrentUser();
                     
                     <div class="user-dropdown" id="userDropdown">
                         <div class="user-avatar">
-                            <?php echo strtoupper(substr($user['full_name'] ?? 'A', 0, 1)); ?>
+                            <?php echo strtoupper(substr($displayName, 0, 1)); ?>
                         </div>
                         <div class="user-info">
-                            <span class="user-name"><?php echo escape($user['full_name'] ?? 'Admin'); ?></span>
+                            <span class="user-name"><?php echo escape($displayName); ?></span>
                             <span class="user-role"><?php echo escape($user['role'] ?? 'admin'); ?></span>
                         </div>
                         <i class="fas fa-chevron-down" style="font-size: 0.75rem; color: var(--text-muted);"></i>

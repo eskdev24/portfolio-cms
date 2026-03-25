@@ -9,7 +9,7 @@ $slug = isset($_GET['slug']) ? sanitize($_GET['slug']) : null;
 
 if ($slug) {
     $post = db()->fetchOne(
-        "SELECT bp.*, u.full_name as author_name, c.name as category_name 
+        "SELECT bp.*, COALESCE(bp.author_name, u.full_name) as display_author, c.name as category_name 
          FROM blog_posts bp 
          LEFT JOIN users u ON bp.author_id = u.id 
          LEFT JOIN categories c ON bp.category_id = c.id 
@@ -52,7 +52,7 @@ if (!$slug) {
     $pagination = paginate($totalPosts, BLOG_PER_PAGE, $page);
     
     $posts = db()->fetchAll(
-        "SELECT bp.*, u.full_name as author_name, c.name as category_name 
+        "SELECT bp.*, COALESCE(bp.author_name, u.full_name) as display_author, c.name as category_name 
          FROM blog_posts bp 
          LEFT JOIN users u ON bp.author_id = u.id 
          LEFT JOIN categories c ON bp.category_id = c.id 
@@ -75,7 +75,7 @@ if (!$slug) {
             <header class="single-post-header">
                 <div class="single-post-meta">
                     <span><i class="far fa-calendar"></i> <?php echo formatDate($post['published_at']); ?></span>
-                    <span><i class="far fa-user"></i> <?php echo escape($post['author_name']); ?></span>
+                    <span><i class="far fa-user"></i> <?php echo escape($post['display_author']); ?></span>
                     <?php if ($post['category_name']): ?>
                         <span><i class="far fa-folder"></i> <?php echo escape($post['category_name']); ?></span>
                     <?php endif; ?>
@@ -125,7 +125,7 @@ if (!$slug) {
                         <i class="far fa-comments"></i> Comments (<?php echo count($comments); ?>)
                     </button>
                     <button class="comment-tab" data-tab="add-comment" style="background: none; border: none; padding: 1rem 1.5rem; font-size: 1rem; font-weight: 500; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-plus"></i> Add Comment
+                        <i class="fas fa-plus"></i> Make a Comment
                     </button>
                 </div>
                 
@@ -222,6 +222,7 @@ if (!$slug) {
                     <i class="fas fa-search blog-search-icon"></i>
                     <input type="text" name="search" class="blog-search-input" placeholder="Search blog posts..." value="<?php echo escape($search); ?>">
                     <button type="submit" class="blog-search-btn">
+                        <i class="fas fa-search"></i>
                         <span>Search</span>
                     </button>
                 </form>

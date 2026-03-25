@@ -43,7 +43,7 @@ $totalPosts = db()->count('blog_posts bp', $whereClause, $params);
 $pagination = paginate($totalPosts, ITEMS_PER_PAGE, $page);
 
 $posts = db()->fetchAll(
-    "SELECT bp.*, u.full_name as author_name, c.name as category_name 
+    "SELECT bp.*, COALESCE(bp.author_name, u.full_name) as display_author, c.name as category_name 
      FROM blog_posts bp 
      LEFT JOIN users u ON bp.author_id = u.id 
      LEFT JOIN categories c ON bp.category_id = c.id 
@@ -119,7 +119,7 @@ $categories = db()->fetchAll("SELECT * FROM categories ORDER BY name ASC");
                                     <?php echo escape(truncate($post['title'], 40)); ?>
                                 </a>
                             </td>
-                            <td><?php echo escape($post['author_name']); ?></td>
+                            <td><?php echo escape($post['display_author']); ?></td>
                             <td><?php echo escape($post['category_name'] ?? '-'); ?></td>
                             <td><?php echo $post['view_count']; ?></td>
                             <td>

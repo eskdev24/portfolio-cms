@@ -31,6 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     if (empty($errors)) {
+        $author_name = sanitize($_POST['author_name'] ?? '');
+        
         $data = [
             'title' => $title,
             'slug' => $slug,
@@ -38,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'content' => $content,
             'category_id' => $category_id,
             'author_id' => $_SESSION['user_id'],
+            'author_name' => $author_name ?: null,
             'tags' => $tags,
             'featured' => $featured,
             'status' => $status,
@@ -110,6 +113,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <div class="form-row">
                 <div class="form-group">
+                    <label class="form-label">Author Name</label>
+                    <input type="text" name="author_name" class="form-control" value="<?php echo old('author_name'); ?>" placeholder="Guest author name (optional)">
+                    <div class="form-hint">Leave empty to use your name</div>
+                </div>
+                
+                <div class="form-group">
                     <label class="form-label">Tags</label>
                     <input type="text" name="tags" class="form-control" value="<?php echo old('tags'); ?>" placeholder="web development, tutorial, javascript">
                     <div class="form-hint">Comma-separated list</div>
@@ -138,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div id="filePreview" style="display: none;"></div>
             </div>
             
-            <div class="form-row">
+            <div class="form-row" style="margin-top: 1rem;">
                 <div class="form-group">
                     <label class="form-label">Status</label>
                     <select name="status" class="form-select">
@@ -147,8 +156,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </select>
                 </div>
                 
-                <div class="form-group" style="display: flex; align-items: center; padding-top: 1.5rem;">
-                    <div class="checkbox-wrapper">
+                <div class="form-group">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="checkbox-wrapper" style="margin-top: 0.5rem;">
                         <input type="checkbox" name="featured" id="featured" value="1" <?php echo old('featured') ? 'checked' : ''; ?>>
                         <label for="featured">Featured Post</label>
                     </div>

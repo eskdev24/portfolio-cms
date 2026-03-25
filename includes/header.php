@@ -4,7 +4,7 @@
  */
 
 $currentPage = basename($_SERVER['PHP_SELF'], '.php');
-$siteName = getSetting('site_name', 'Eugene Simpson');
+$siteName = getSetting('site_name', 'esk.dev');
 $siteTagline = getSetting('site_tagline', 'Web Developer & Designer');
 ?>
 <!DOCTYPE html>
@@ -16,6 +16,13 @@ $siteTagline = getSetting('site_tagline', 'Web Developer & Designer');
     <meta name="author" content="<?php echo escape($siteName); ?>">
     
     <title><?php echo isset($pageTitle) ? escape($pageTitle) . ' | ' : ''; ?><?php echo escape($siteName); ?></title>
+    
+    <?php $favicon = getSetting('favicon'); ?>
+    <?php if (!empty($favicon) && file_exists(ROOT_PATH . 'uploads/' . $favicon)): ?>
+        <link rel="icon" type="image/x-icon" href="<?php echo SITE_URL; ?>/uploads/<?php echo escape($favicon); ?>">
+    <?php else: ?>
+        <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAZ5JREFUWIXtl7FuwzAMRB+NsGnXDs0SnKKdOi6gS5cuobN0SJcuXbp0yk2n0+nSIZ2gBEJYv4S/EsX2e2P/YEcA/H8iwOVy+R6Px/fL5fJ9uVy+z+fz93Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/t0Or1Pp9P7dDq9T6fT+3Q6vU+n0/l1+f4HAJfV3hQ4b0OQAAAAASUVORK5CYII=">
+    <?php endif; ?>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,7 +43,7 @@ $siteTagline = getSetting('site_tagline', 'Web Developer & Designer');
         <header class="header" id="header">
             <nav class="navbar container">
                 <a href="<?php echo SITE_URL; ?>/index.php" class="logo">
-                    <span class="logo-text">Eugene<span class="accent">.</span>Simpson</span>
+                    <span class="logo-text"><?php echo formatLogo($siteName); ?></span>
                 </a>
                 
                 <div class="nav-menu" id="navMenu">

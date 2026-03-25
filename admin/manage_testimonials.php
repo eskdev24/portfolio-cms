@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_testimonial'])) {
     if (empty($name) || empty($content)) {
         $errors[] = 'Name and content are required.';
     } else {
-        db()->insert('testimonials', [
+        $data = [
             'name' => $name,
             'position' => $position,
             'company' => $company,
@@ -47,7 +47,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_testimonial'])) {
             'rating' => min(5, max(1, $rating)),
             'status' => 'approved',
             'sort_order' => (int)$_POST['sort_order']
-        ]);
+        ];
+        
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $upload = uploadImage($_FILES['image'], 'uploads/testimonials/');
+            if (isset($upload['filename'])) {
+                $data['image'] = $upload['filename'];
+            }
+        }
+        
+        db()->insert('testimonials', $data);
         
         setFlash('success', 'Testimonial added successfully!');
         redirect(ADMIN_URL . '/manage_testimonials.php');
@@ -65,14 +74,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_testimonial'])
     if (empty($name) || empty($content)) {
         $errors[] = 'Name and content are required.';
     } else {
-        db()->update('testimonials', [
+        $data = [
             'name' => $name,
             'position' => $position,
             'company' => $company,
             'content' => $content,
             'rating' => min(5, max(1, $rating)),
             'sort_order' => (int)$_POST['sort_order']
-        ], 'id = :id', ['id' => $id]);
+        ];
+        
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            if ($testimonial['image']) {
+                deleteImage($testimonial['image'], 'uploads/testimonials/');
+            }
+            $upload = uploadImage($_FILES['image'], 'uploads/testimonials/');
+            if (isset($upload['filename'])) {
+                $data['image'] = $upload['filename'];
+            }
+        }
+        
+        if (isset($_POST['remove_image'])) {
+            if ($testimonial['image']) {
+                deleteImage($testimonial['image'], 'uploads/testimonials/');
+            }
+            $data['image'] = null;
+        }
+        
+        db()->update('testimonials', $data, 'id = :id', ['id' => $id]);
         
         setFlash('success', 'Testimonial updated successfully!');
         redirect(ADMIN_URL . '/manage_testimonials.php');
@@ -93,36 +121,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_testimonial'])
             </div>
         <?php endif; ?>
         
-        <form action="" method="POST" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
-            <input type="hidden" name="add_testimonial" value="1">
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label">Name *</label>
-                <input type="text" name="name" class="form-control" required>
+        <form action="" method="POST" enctype="multipart/form-data">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Profile Image</label>
+                    <input type="file" name="image" class="form-control" accept="image/*">
+                    <div class="form-hint">JPG, PNG, GIF (Max 2MB)</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Name *</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Position</label>
+                    <input type="text" name="position" class="form-control">
+                </div>
             </div>
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label">Position</label>
-                <input type="text" name="position" class="form-control">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Company</label>
+                    <input type="text" name="company" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Rating</label>
+                    <select name="rating" class="form-select">
+                        <option value="5">5 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="2">2 Stars</option>
+                        <option value="1">1 Star</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sort Order</label>
+                    <input type="number" name="sort_order" class="form-control" value="0">
+                </div>
             </div>
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label">Company</label>
-                <input type="text" name="company" class="form-control">
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-                <label class="form-label">Rating</label>
-                <select name="rating" class="form-select">
-                    <option value="5">5 Stars</option>
-                    <option value="4">4 Stars</option>
-                    <option value="3">3 Stars</option>
-                    <option value="2">2 Stars</option>
-                    <option value="1">1 Star</option>
-                </select>
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
+            <div class="form-group">
                 <label class="form-label">Content *</label>
-                <input type="text" name="content" class="form-control" required>
+                <textarea name="content" class="form-control" rows="3" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Add
+            <button type="submit" class="btn btn-primary" name="add_testimonial" value="1">
+                <i class="fas fa-plus"></i> Add Testimonial
             </button>
         </form>
     </div>
@@ -200,9 +240,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_testimonial'])
             </span>
         </div>
         <div class="modal-body">
-            <form action="" method="POST">
+            <form action="" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="update_testimonial" value="1">
                 <input type="hidden" name="id" id="edit_id">
+                <div class="form-group">
+                    <label class="form-label">Profile Image</label>
+                    <input type="file" name="image" class="form-control" accept="image/*">
+                    <div class="form-hint">JPG, PNG, GIF (Max 2MB)</div>
+                </div>
                 <div class="form-group">
                     <label class="form-label">Name *</label>
                     <input type="text" name="name" id="edit_name" class="form-control" required>

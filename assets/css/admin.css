@@ -89,9 +89,26 @@ img {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--text-primary);
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
 }
 
-.sidebar-logo span {
+.sidebar-logo .esk {
+    font-weight: 700;
+    color: white;
+}
+
+.sidebar-logo .dot {
+    color: var(--primary);
+    font-weight: 300;
+    margin-left: -0.05em;
+}
+
+.sidebar-logo .dev {
+    font-weight: 700;
     color: var(--primary);
 }
 
@@ -804,9 +821,25 @@ textarea.form-control {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: -0.02em;
+    display: flex;
+    justify-content: center;
 }
 
-.login-logo span {
+.login-logo .esk {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.login-logo .dot {
+    color: var(--primary);
+    font-weight: 300;
+    margin-left: -0.05em;
+}
+
+.login-logo .dev {
+    font-weight: 700;
     color: var(--primary);
 }
 

@@ -11,6 +11,14 @@ function escape($string) {
     return htmlspecialchars($string ?? '', ENT_QUOTES, 'UTF-8');
 }
 
+function formatLogo($siteName) {
+    if (strpos($siteName, '.') !== false) {
+        $parts = explode('.', $siteName, 2);
+        return '<span class="esk">' . escape($parts[0]) . '</span><span class="dot">.</span><span class="dev">' . escape($parts[1]) . '</span>';
+    }
+    return '<span class="esk">' . escape($siteName) . '</span>';
+}
+
 function redirect($url) {
     header("Location: " . $url);
     exit;

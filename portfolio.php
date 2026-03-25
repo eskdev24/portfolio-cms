@@ -144,7 +144,7 @@ $projects = db()->fetchAll(
             </p>
             <div class="cta-buttons">
                 <a href="<?php echo SITE_URL; ?>/contact.php" class="btn btn-lg">
-                    <i class="fas fa-paper-plane"></i> Start a Project
+                    <i class="fas fa-paper-plane"></i> Get In Touch
                 </a>
             </div>
         </div>

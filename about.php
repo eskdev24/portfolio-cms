@@ -20,44 +20,13 @@ foreach ($skills as $skill) {
 
 $stats = [
     'projects' => db()->count('projects', "status = 'published'"),
-    'clients' => 50,
+    'clients' => 150,
     'experience' => 5,
     'awards' => 15
 ];
 
-$experience = [
-    [
-        'year' => '2020 - Present',
-        'title' => 'Senior Web Developer',
-        'company' => 'Tech Innovations Inc.',
-        'description' => 'Lead development of enterprise web applications, mentoring junior developers, and implementing modern architecture patterns.'
-    ],
-    [
-        'year' => '2018 - 2020',
-        'title' => 'Web Developer & Designer',
-        'company' => 'Creative Agency Studio',
-        'description' => 'Developed responsive websites and web applications for diverse clients across various industries.'
-    ],
-    [
-        'year' => '2016 - 2018',
-        'title' => 'Junior Web Developer',
-        'company' => 'StartUp Hub',
-        'description' => 'Built and maintained WordPress websites, e-commerce stores, and custom web solutions.'
-    ]
-];
-
-$education = [
-    [
-        'year' => '2014 - 2016',
-        'degree' => 'Master\'s in Computer Science',
-        'school' => 'Stanford University'
-    ],
-    [
-        'year' => '2010 - 2014',
-        'degree' => 'Bachelor\'s in Information Technology',
-        'school' => 'UC Berkeley'
-    ]
-];
+$experience = db()->fetchAll("SELECT * FROM experience WHERE status = 'active' ORDER BY sort_order ASC, id DESC");
+$education = db()->fetchAll("SELECT * FROM education WHERE status = 'active' ORDER BY sort_order ASC, id DESC");
 ?>
 <?php require_once 'includes/header.php'; ?>
 
@@ -84,7 +53,7 @@ $education = [
             <div class="about-content">
                 <h2>About Me</h2>
                 <p>
-                    Hello! I'm <?php echo escape(getSetting('site_name', 'Eugene Simpson')); ?>, a passionate web developer and graphic designer
+                    Hello! I'm <?php echo escape(getSetting('name', 'Eugene Simpson')); ?>, a passionate web developer and graphic designer
                     based in <?php echo escape(getSetting('address', 'Accra, GH')); ?>. I specialize in creating
                     modern, responsive, and user-friendly digital experiences.
                 </p>
@@ -148,32 +117,33 @@ $education = [
             </p>
         </div>
         
-        <div class="skills-grid">
+        <?php if (!empty($skillsByCategory)): ?>
             <?php foreach ($skillsByCategory as $category => $categorySkills): ?>
-                <div class="skill-category fade-in">
-                    <h3 class="skill-category-title">
-                        <i class="fas fa-<?php echo $category === 'development' ? 'code' : 'palette'; ?>"></i>
-                        <?php echo ucfirst($category); ?>
+                <div style="margin-bottom: 3rem;">
+                    <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; justify-content: center;">
+                        <i class="fas fa-<?php echo $category === 'design' ? 'palette' : 'code'; ?>" style="color: var(--primary);"></i>
+                        <?php echo ucfirst($category); ?> Skills
                     </h3>
-                    <?php foreach ($categorySkills as $skill): ?>
-                        <div class="skill-item">
-                            <div class="skill-header">
-                                <span class="skill-name">
+                    <div class="skills-grid">
+                        <?php foreach ($categorySkills as $skill): ?>
+                            <div class="skill-circle fade-in">
+                                <svg viewBox="0 0 100 100">
+                                    <circle class="skill-circle-bg" cx="50" cy="50" r="45"></circle>
+                                    <circle class="skill-circle-progress" cx="50" cy="50" r="45" data-progress="<?php echo $skill['proficiency']; ?>"></circle>
+                                </svg>
+                                <div class="skill-circle-content">
                                     <?php if ($skill['icon']): ?>
-                                        <i class="<?php echo escape($skill['icon']); ?>"></i>
+                                        <div class="skill-circle-icon"><i class="<?php echo escape($skill['icon']); ?>"></i></div>
                                     <?php endif; ?>
-                                    <?php echo escape($skill['name']); ?>
-                                </span>
-                                <span class="skill-percent"><?php echo $skill['proficiency']; ?>%</span>
+                                    <span class="skill-circle-name"><?php echo escape($skill['name']); ?></span>
+                                    <div class="skill-circle-percent"><?php echo $skill['proficiency']; ?>%</div>
+                                </div>
                             </div>
-                            <div class="skill-bar">
-                                <div class="skill-progress" data-progress="<?php echo $skill['proficiency']; ?>"></div>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             <?php endforeach; ?>
-        </div>
+        <?php endif; ?>
     </div>
 </section>
 
@@ -240,19 +210,19 @@ $education = [
         
         <div class="hero-stats" style="justify-content: center;">
             <div class="stat-item fade-in">
-                <div class="stat-number"><?php echo $stats['projects']; ?>+</div>
+                <div class="stat-number" data-target="<?php echo $stats['projects']; ?>">0</div>
                 <div class="stat-label">Projects Completed</div>
             </div>
             <div class="stat-item fade-in">
-                <div class="stat-number"><?php echo $stats['clients']; ?>+</div>
+                <div class="stat-number" data-target="<?php echo $stats['clients']; ?>">0</div>
                 <div class="stat-label">Happy Clients</div>
             </div>
             <div class="stat-item fade-in">
-                <div class="stat-number"><?php echo $stats['experience']; ?>+</div>
+                <div class="stat-number" data-target="<?php echo $stats['experience']; ?>">0</div>
                 <div class="stat-label">Years Experience</div>
             </div>
             <div class="stat-item fade-in">
-                <div class="stat-number"><?php echo $stats['awards']; ?>+</div>
+                <div class="stat-number" data-target="<?php echo $stats['awards']; ?>">0</div>
                 <div class="stat-label">Awards Won</div>
             </div>
         </div>

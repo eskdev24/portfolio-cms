@@ -5,7 +5,7 @@
                 <div class="footer-grid">
                     <div class="footer-section">
                         <a href="<?php echo SITE_URL; ?>/index.php" class="footer-logo">
-                            <span class="logo-text">Eugene<span class="accent">.</span>Simpson</span>
+                            <span class="logo-text"><?php echo formatLogo(getSetting('site_name', 'esk.dev')); ?></span>
                         </a>
                         <p class="footer-text">
                             Creating beautiful digital experiences through creative design and clean code.
@@ -53,11 +53,13 @@
                     <div class="footer-section">
                         <h4 class="footer-title">Services</h4>
                         <ul class="footer-links">
-                            <li>Web Development</li>
+                            <li>Website Dev</li>
+                            <li>Web App Dev</li>
+                            <li>Mobile App Dev</li>
+                            <li>UI/UX Designs</li>
                             <li>Graphic Design</li>
-                            <li>UI/UX Design</li>
-                            <li>Brand Identity</li>
-                            <li>WordPress Development</li>
+                            <li>WordPress Sites</li>
+                            <li>Database Dev</li>
                         </ul>
                     </div>
                     
@@ -87,7 +89,7 @@
                 </div>
                 
                 <div class="footer-bottom">
-                    <p>&copy; <?php echo date('Y'); ?> <?php echo escape(getSetting('site_name', 'Eugene Simpson')); ?>. All Rights Reserved.</p>
+                    <p>&copy; <?php echo date('Y'); ?> <?php echo escape(getSetting('site_name', 'esk.dev')); ?>. All Rights Reserved.</p>
                 </div>
             </div>
         </footer>

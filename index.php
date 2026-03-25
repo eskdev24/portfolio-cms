@@ -15,11 +15,11 @@ $featuredProjects = db()->fetchAll(
 );
 
 $latestPosts = db()->fetchAll(
-    "SELECT bp.*, u.full_name as author_name, c.name as category_name 
+    "SELECT bp.*, COALESCE(bp.author_name, u.full_name) as display_author, c.name as category_name 
      FROM blog_posts bp 
      LEFT JOIN users u ON bp.author_id = u.id 
      LEFT JOIN categories c ON bp.category_id = c.id 
-     WHERE bp.featured = 1 AND bp.status = 'published' 
+     WHERE bp.status = 'published' 
      ORDER BY bp.published_at DESC 
      LIMIT 3"
 );
@@ -30,7 +30,7 @@ $skills = db()->fetchAll(
 
 $stats = [
     'projects' => db()->count('projects', "status = 'published'"),
-    'clients' => 50,
+    'clients' => 150,
     'experience' => 5,
     'awards' => 15
 ];
@@ -51,7 +51,7 @@ $testimonials = db()->fetchAll(
                 </div>
                 
                 <h1 class="hero-title">
-                    Hi, I'm <?php echo escape(getSetting('site_name', 'Eugene Simpson')); ?>
+                    Hi, I'm <?php echo escape(getSetting('name', 'Eugene Simpson')); ?>
                     <br>
                     <span class="highlight">
                         <span class="typed-text"><?php echo escape(getSetting('hero_title', 'Web Developer')); ?></span>
@@ -80,15 +80,15 @@ $testimonials = db()->fetchAll(
                 
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <div class="stat-number"><?php echo $stats['projects']; ?>+</div>
+                        <div class="stat-number" data-target="<?php echo $stats['projects']; ?>">0</div>
                         <div class="stat-label">Projects Completed</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number"><?php echo $stats['clients']; ?>+</div>
+                        <div class="stat-number" data-target="<?php echo $stats['clients']; ?>">0</div>
                         <div class="stat-label">Happy Clients</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-number"><?php echo $stats['experience']; ?>+</div>
+                        <div class="stat-number" data-target="<?php echo $stats['experience']; ?>">0</div>
                         <div class="stat-label">Years Experience</div>
                     </div>
                 </div>
@@ -185,15 +185,17 @@ $testimonials = db()->fetchAll(
         
         <div class="skills-grid">
             <?php foreach ($skills as $skill): ?>
-                <div class="skill-category">
-                    <div class="skill-item">
-                        <div class="skill-header">
-                            <span class="skill-name"><?php echo escape($skill['name']); ?></span>
-                            <span class="skill-percent"><?php echo $skill['proficiency']; ?>%</span>
-                        </div>
-                        <div class="skill-bar">
-                            <div class="skill-progress" style="width: <?php echo $skill['proficiency']; ?>%;"></div>
-                        </div>
+                <div class="skill-circle fade-in">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="skill-circle-bg" cx="50" cy="50" r="45"></circle>
+                        <circle class="skill-circle-progress" cx="50" cy="50" r="45" data-progress="<?php echo $skill['proficiency']; ?>"></circle>
+                    </svg>
+                    <div class="skill-circle-content">
+                        <?php if ($skill['icon']): ?>
+                            <div class="skill-circle-icon"><i class="<?php echo escape($skill['icon']); ?>"></i></div>
+                        <?php endif; ?>
+                        <span class="skill-circle-name"><?php echo escape($skill['name']); ?></span>
+                        <div class="skill-circle-percent"><?php echo $skill['proficiency']; ?>%</div>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -214,9 +216,13 @@ $testimonials = db()->fetchAll(
             <?php foreach ($featuredProjects as $project): ?>
                 <article class="project-card fade-in">
                     <div class="project-image">
-                        <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%); display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-image" style="font-size: 4rem; color: var(--text-muted);"></i>
-                        </div>
+                        <?php if (!empty($project['image']) && file_exists(ROOT_PATH . 'uploads/projects/' . $project['image'])): ?>
+                            <img src="<?php echo SITE_URL; ?>/uploads/projects/<?php echo escape($project['image']); ?>" alt="<?php echo escape($project['title']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                        <?php else: ?>
+                            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%); display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-image" style="font-size: 4rem; color: var(--text-muted);"></i>
+                            </div>
+                        <?php endif; ?>
                         <div class="project-overlay">
                             <?php if ($project['project_url']): ?>
                                 <a href="<?php echo escape($project['project_url']); ?>" target="_blank" class="btn btn-sm btn-primary">
@@ -262,26 +268,46 @@ $testimonials = db()->fetchAll(
             </p>
         </div>
         
-        <div class="testimonials-slider">
-            <?php foreach ($testimonials as $testimonial): ?>
-                <div class="testimonial-card fade-in">
-                    <p class="testimonial-content">"<?php echo escape($testimonial['content']); ?>"</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">
-                            <?php echo strtoupper(substr($testimonial['name'], 0, 1)); ?>
-                        </div>
-                        <div class="testimonial-info">
-                            <h4><?php echo escape($testimonial['name']); ?></h4>
-                            <p><?php echo escape($testimonial['position']); ?><?php echo $testimonial['company'] ? ' at ' . escape($testimonial['company']) : ''; ?></p>
-                            <div class="testimonial-rating">
-                                <?php for ($i = 0; $i < $testimonial['rating']; $i++): ?>
-                                    <i class="fas fa-star"></i>
-                                <?php endfor; ?>
+        <div class="testimonials-slider-wrapper">
+            <div class="testimonials-slider">
+                <?php foreach ($testimonials as $testimonial): ?>
+                    <div class="testimonial-slide">
+                        <div class="testimonial-card">
+                            <p class="testimonial-content">"<?php echo escape($testimonial['content']); ?>"</p>
+                            <div class="testimonial-author">
+                                <?php if (!empty($testimonial['image']) && file_exists(ROOT_PATH . 'uploads/testimonials/' . $testimonial['image'])): ?>
+                                    <img src="<?php echo SITE_URL; ?>/uploads/testimonials/<?php echo escape($testimonial['image']); ?>" alt="<?php echo escape($testimonial['name']); ?>" class="testimonial-avatar" style="width: 70px; height: 70px; object-fit: cover;">
+                                <?php else: ?>
+                                    <div class="testimonial-avatar">
+                                        <?php echo strtoupper(substr($testimonial['name'], 0, 1)); ?>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="testimonial-info">
+                                    <h4><?php echo escape($testimonial['name']); ?></h4>
+                                    <p><?php echo escape($testimonial['position']); ?><?php echo $testimonial['company'] ? ' at ' . escape($testimonial['company']) : ''; ?></p>
+                                    <div class="testimonial-rating">
+                                        <?php for ($i = 0; $i < $testimonial['rating']; $i++): ?>
+                                            <i class="fas fa-star"></i>
+                                        <?php endfor; ?>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                <?php endforeach; ?>
+            </div>
+            
+            <?php if (count($testimonials) > 1): ?>
+            <div class="testimonial-nav">
+                <button class="testimonial-prev" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
+                <div class="testimonial-dots">
+                    <?php foreach ($testimonials as $i => $t): ?>
+                        <button class="testimonial-dot <?php echo $i === 0 ? 'active' : ''; ?>" data-index="<?php echo $i; ?>" aria-label="Go to slide <?php echo $i + 1; ?>"></button>
+                    <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
+                <button class="testimonial-next" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -301,9 +327,13 @@ $testimonials = db()->fetchAll(
             <?php foreach ($latestPosts as $post): ?>
                 <article class="blog-card fade-in">
                     <div class="blog-image">
-                        <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-blog" style="font-size: 3rem; color: white;"></i>
-                        </div>
+                        <?php if (!empty($post['image']) && file_exists(ROOT_PATH . 'uploads/blog/' . $post['image'])): ?>
+                            <img src="<?php echo SITE_URL; ?>/uploads/blog/<?php echo escape($post['image']); ?>" alt="<?php echo escape($post['title']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                        <?php else: ?>
+                            <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-blog" style="font-size: 3rem; color: white;"></i>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <div class="blog-content">
                         <div class="blog-meta">

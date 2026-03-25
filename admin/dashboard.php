@@ -30,7 +30,7 @@ $recentMessages = db()->fetchAll(
 );
 
 $recentPosts = db()->fetchAll(
-    "SELECT bp.*, u.full_name as author_name 
+    "SELECT bp.*, COALESCE(bp.author_name, u.full_name) as display_author 
      FROM blog_posts bp 
      LEFT JOIN users u ON bp.author_id = u.id 
      ORDER BY bp.created_at DESC 
@@ -199,7 +199,7 @@ $recentPosts = db()->fetchAll(
                                     <?php echo escape(truncate($post['title'], 40)); ?>
                                 </a>
                             </td>
-                            <td><?php echo escape($post['author_name']); ?></td>
+                            <td><?php echo escape($post['display_author']); ?></td>
                             <td><?php echo $post['view_count']; ?></td>
                             <td>
                                 <span class="status-badge status-<?php echo $post['status']; ?>">

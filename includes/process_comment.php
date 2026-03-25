@@ -2,6 +2,7 @@
 require_once '../includes/config.php';
 require_once '../includes/db.php';
 require_once '../includes/helpers.php';
+require_once '../includes/auth.php';
 
 header('Content-Type: application/json');
 
@@ -44,6 +45,8 @@ try {
         'status' => 'pending',
         'ip_address' => getClientIP()
     ]);
+    
+    logActivity(null, 'new_comment', "New comment from {$name} on post ID {$post_id}");
     
     jsonResponse([
         'success' => true, 

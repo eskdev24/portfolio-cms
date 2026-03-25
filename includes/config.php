@@ -3,7 +3,8 @@
  * Portfolio CMS Configuration
  */
 
-define('SITE_NAME', 'Eugene Simpson');
+define('NAME', 'Eugene Simpson');
+define('SITE_NAME', 'esk.dev');
 define('SITE_TAGLINE', 'Web Developer & Graphic Designer');
 define('SITE_URL', 'http://localhost/apps/portfolio-cms');
 define('ADMIN_URL', SITE_URL . '/admin');
